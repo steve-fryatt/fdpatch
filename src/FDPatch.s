@@ -26,9 +26,6 @@
 ;
 ; REM 26/32 bit neutral
 
-;version$="1.10"
-;save_as$="FDPatch"
-
 	GET	$Include/SWINames
 
 ; ---------------------------------------------------------------------------------------------------------------------
@@ -75,7 +72,7 @@ TitleString
 	ALIGN
 
 HelpString
-	DCB	"Filer Dir Patch",9,$BuildVersion," (",$BuildDate,") ",169," Stephen Fryatt, 2001",0;-",$BuildDate:RIGHT:4,0
+	DCB	"Filer Dir Patch",9,$BuildVersion," (",$BuildDate,") ",169," Stephen Fryatt, 2001-",$BuildDate:RIGHT:4,0
 	ALIGN
 
 ; ======================================================================================================================
