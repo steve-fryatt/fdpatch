@@ -1,292 +1,263 @@
-REM >FDPatchSrc
-REM
-REM FilerDirPatch Module
-REM (c) Stephen Fryatt, 2001
-REM
-REM Needs ExtBasAsm to assemble.
-REM 26/32 bit neutral
+; Copyright 2001-2013, Stephen Fryatt (info@stevefryatt.org.uk)
+;
+; This file is part of FilerDirPatch:
+;
+;   http://www.stevefryatt.org.uk/software/
+;
+; Licensed under the EUPL, Version 1.1 only (the "Licence");
+; You may not use this work except in compliance with the
+; Licence.
+;
+; You may obtain a copy of the Licence at:
+;
+;   http://joinup.ec.europa.eu/software/page/eupl
+;
+; Unless required by applicable law or agreed to in
+; writing, software distributed under the Licence is
+; distributed on an "AS IS" basis, WITHOUT WARRANTIES
+; OR CONDITIONS OF ANY KIND, either express or implied.
+;
+; See the Licence for the specific language governing
+; permissions and limitations under the Licence.
 
-version$="1.10"
-save_as$="FDPatch"
+; FDPatch.s
+;
+; FilerDirPatch Module Source
+;
+; REM 26/32 bit neutral
 
-LIBRARY "<Reporter$Dir>.AsmLib"
+;version$="1.10"
+;save_as$="FDPatch"
 
-PRINT "Assemble debug? (Y/N)"
-REPEAT
- g%=GET
-UNTIL (g% AND &DF)=ASC("Y") OR (g% AND &DF)=ASC("N")
-debug%=((g% AND &DF)=ASC("Y"))
+; ---------------------------------------------------------------------------------------------------------------------
+; Set up the Module Workspace
 
-ON ERROR PRINT REPORT$;" at line ";ERL : END
+WS_BlockSize		*	256
 
-REM --------------------------------------------------------------------------------------------------------------------
-REM Set up workspace
+			^	0
+WS_TaskHandle		#	4
+WS_Block		#	WS_BlockSize
 
-workspace_size%=0 : REM This is updated.
+WS_Size			*	@
 
-task_handle%=FNworkspace(workspace_size%,4)
-block%=FNworkspace(workspace_size%,256)
+; ======================================================================================================================
+; Module Header
 
-REM --------------------------------------------------------------------------------------------------------------------
+	AREA	Module,CODE,READONLY
+	ENTRY
 
-DIM time% 5, date% 256
-?time%=3
-SYS "OS_Word",14,time%
-SYS "Territory_ConvertDateAndTime",-1,time%,date%,255,"(%dy %m3 %ce%yr)" TO ,date_end%
-?date_end%=13
-
-REM --------------------------------------------------------------------------------------------------------------------
-
-code_space%=4000
-DIM code% code_space%
-
-pass_flags%=%11100
-
-IF debug% THEN PROCReportInit(200)
-
-
-FOR pass%=pass_flags% TO pass_flags% OR %10 STEP %10
-L%=code%+code_space%
-O%=code%
-P%=0
-IF debug% THEN PROCReportStart(pass%)
-[OPT pass%
-EXT 1
-          EQUD      0                   ; Offset to task code
-          EQUD      init_code           ; Offset to initialisation code
-          EQUD      final_code          ; Offset to finalisation code
-          EQUD      0                   ; Offset to service-call handler
-          EQUD      title_string        ; Offset to title string
-          EQUD      help_string         ; Offset to help string
-          EQUD      0                   ; Offset to command table
-          EQUD      0                   ; SWI Chunk number
-          EQUD      0                   ; Offset to SWI handler code
-          EQUD      0                   ; Offset to SWI decoding table
-          EQUD      0                   ; Offset to SWI decoding code
-          EQUD      0                   ; MessageTrans file
-          EQUD      module_flags        ; Offset to module flags
+ModuleHeader
+	DCD	0				; Offset to task code
+	DCD	InitCode			; Offset to initialisation code
+	DCD	FinalCode			; Offset to finalisation code
+	DCD	0				; Offset to service-call handler
+	DCD	TitleString			; Offset to title string
+	DCD	HelpString			; Offset to help string
+	DCD	0				; Offset to command table
+	DCD	0				; SWI Chunk number
+	DCD	0				; Offset to SWI handler code
+	DCD	0				; Offset to SWI decoding table
+	DCD	0				; Offset to SWI decoding code
+	DCD	0				; MessageTrans file
+	DCD	ModuleFlags			; Offset to module flags
 
 ; ======================================================================================================================
 
-.module_flags
-          EQUD      1                   ; 32-bit compatible
+ModuleFlags
+	DCD	1				; 32-bit compatible
 
 ; ======================================================================================================================
 
-.title_string
-          EQUZ      "FilerDirPatch"
-          ALIGN
+TitleString
+	DCB	"FilerDirPatch",0
+	ALIGN
 
-.help_string
-          EQUS      "Filer Dir Patch"
-          EQUB      9
-          EQUS      version$
-          EQUS      " "
-          EQUS      $date%
-          EQUZ      " © Stephen Fryatt, 2001"
-          ALIGN
+HelpString
+	DCB	"Filer Dir Patch",9,$BuildVersion," (",$BuildDate,") ",169," Stephen Fryatt, 2001",0;-",$BuildDate:RIGHT:4,0
+	ALIGN
 
 ; ======================================================================================================================
 
-.init_code
-          STMFD     R13!,{R14}
+InitCode
+	STMFD	R13!,{R14}
 
 ; Claim 296 bytes of workspace for ourselves and store the pointer in our private workspace.
 ; This space is used for everything; both the module 'back-end' and the WIMP task.
 
-          MOV       R0,#6
-          MOV       R3,#workspace_size%
-          SWI       "XOS_Module"
-          BVS       init_exit
-          STR       R2,[R12]
-          MOV       R12,R2
+	MOV	R0,#6
+	MOV	R3,#WS_Size
+	SWI	"XOS_Module"
+	BVS	InitExit
+	STR	R2,[R12]
+	MOV	R12,R2
 
 ; Initialise the workspace that was just claimed.
 
 
 ; Enumerate the tasks and apply a filter to the filer.
 
-          MOV       R0,#0
-          STR       R0,[R12,#task_handle%]
+	MOV	R0,#0
+	STR	R0,[R12,#WS_TaskHandle]
 
-.init_find_loop
-          ADRW      R1,block%
-          MOV       R2,#16
-          SWI       "XTaskManager_EnumerateTasks"
+InitFindLoop
+	ADD	R1,R12,#WS_Block
+	MOV	R2,#16
+	SWI	"XTaskManager_EnumerateTasks"
 
-          ADRW      R3,block%
-          TEQ       R1,R3
-          BEQ       init_find_loop_end
+	ADD	R3,R12,#WS_Block
+	TEQ	R1,R3
+	BEQ	InitFindLoopEnd
 
-          LDR       R3,[R3,#4]
-          ADR       R4,task_name
+	LDR	R3,[R3,#4]
+	ADR	R4,FilterTaskName
 
-.init_find_compare_loop
-          LDRB      R5,[R3],#1
-          LDRB      R6,[R4],#1
-          TEQ       R5,R6
-          BNE       init_find_loop_end
-          TEQ       R6,#0
-          BNE       init_find_compare_loop
+InitFindCompareLoop
+	LDRB	R5,[R3],#1
+	LDRB	R6,[R4],#1
+	TEQ	R5,R6
+	BNE	InitFindLoopEnd
+	TEQ	R6,#0
+	BNE	InitFindCompareLoop
 
-          LDR       R3,[R12,#block%]
-          STR       R3,[R12,#task_handle%]
+	LDR	R3,[R12,#WS_Block]
+	STR	R3,[R12,#WS_TaskHandle]
 
-          B         init_find_loop_exit
+	B	InitFindLoopExit
 
-.init_find_loop_end
-          CMP       R0,#0
-          BGE       init_find_loop
+InitFindLoopEnd
+	CMP	R0,#0
+	BGE	InitFindLoop
 
-.init_find_loop_exit
-          LDR       R3,[R12,#task_handle%]
-          TEQ       R3,#0                                   ; If task handle is zero, there wasn't a Filer running...
-          BEQ       init_exit                               ; Currently we continue to run but register no filter. ;-(
+InitFindLoopExit
+	LDR	R3,[R12,#WS_TaskHandle]
+	TEQ	R3,#0					; If task handle is zero, there wasn't a Filer running...
+	BEQ	InitExit				; Currently we continue to run but register no filter. ;-(
 
-.init_register_filter
-          ADR       R0,title_string
-          ADR       R1,filter_code
-          MOV       R2,R12
-          LDR       R4,poll_mask
+InitRegisterFilter
+	ADR	R0,TitleString
+	ADR	R1,FilterCode
+	MOV	R2,R12
+	LDR	R4,FilterPollMask
 
-          SWI       "XFilter_RegisterPostFilter"
+	SWI	"XFilter_RegisterPostFilter"
 
-.init_exit
-          LDMFD     R13!,{PC}
+InitExit
+	LDMFD	R13!,{PC}
+
+; ----------------------------------------------------------------------------------------------------------------------
+
+FilerPollMask
+	DCD	&FFFFFFFF :EOR: (1<<6)+(1<<9)
+
+FilterTaskName
+	DCB	"Filer",0
+	ALIGN
 
 ; ----------------------------------------------------------------------------------------------------------------------
 
-.poll_mask
-          EQUD      &FFFFFFFF EOR (1<<6)+(1<<9)
+FinalCode
+	STMFD	R13!,{R14}
+	LDR	R12,[R12]
 
-.task_name
-          EQUZ      "Filer"
-          ALIGN
+FinalDeregisterFilter
+	LDR	R3,[R12,#WS_TaskHandle]
+	TEQ	R3,#0
+	BEQ	FinalReleaseWorkspace
 
-; ----------------------------------------------------------------------------------------------------------------------
-.final_code
-          STMFD     R13!,{R14}
-          LDR       R12,[R12]
+	ADR	R0,TitleString
+	ADR	R1,FilterCode
+	MOV	R2,R12
+	LDR	R4,FilterPollMask
+	SWI	"XFilter_DeRegisterPostFilter"
 
-.final_deregister_filter
-          LDR       R3,[R12,#task_handle%]
-          TEQ       R3,#0
-          BEQ       final_release_workspace
-
-          ADR       R0,title_string
-          ADR       R1,filter_code
-          MOV       R2,R12
-          LDR       R4,poll_mask
-          SWI       "XFilter_DeRegisterPostFilter"
-
-.final_release_workspace
-          TEQ       R12,#0
-          BEQ       final_exit
-          MOV       R0,#7
-          MOV       R2,R12
-          SWI       "XOS_Module"
-
-.final_exit
-          LDMFD     R13!,{PC}
+FinalReleaseWorkspace
+	TEQ	R12,#0
+	BEQ	FinalExit
+	MOV	R0,#7
+	MOV	R2,R12
+	SWI	"XOS_Module"
+FinalExit
+	LDMFD	R13!,{PC}
 
 ; ======================================================================================================================
 
-.filter_code
-          STMFD     R13!,{R0-R5,R14}
+FilterCode
+	STMFD	R13!,{R0-R5,R14}
 
-.filter_mouse_click
-          TEQ       R0,#6
-          BNE       filter_menu_selection
+FilterMouseClick
+	TEQ	R0,#6
+	BNE	FilterMenuSelection
 
-          ; Test if the menu button was clicked.
+	; Test if the menu button was clicked.
 
-          LDR       R2,[R1,#8]
-          TEQ       R2,#2
-          BNE       filter_exit
+	LDR	R2,[R1,#8]
+	TEQ	R2,#2
+	BNE	FilterExit
 
-          ; Get the window information
+	; Get the window information
 
-          LDR       R3,[R1,#12]
-          ADRW      R2,block%
-          STR       R3,[R2,#0]
+	LDR	R3,[R1,#12]
+	ADD	R2,R12,#WS_Block
+	STR	R3,[R2,#0]
 
-          ORR       R1,R2,#1
-          SWI       "XWimp_GetWindowInfo"
+	ORR	R1,R2,#1
+	SWI	"XWimp_GetWindowInfo"
 
-          LDR       R3,[R2,#76]
-          MOV       R4,R2
+	LDR	R3,[R2,#76]
+	MOV	R4,R2
 
-.filter_mouse_loop1
-          LDRB      R5,[R3],#1
-          STRB      R5,[R4],#1
+FilterMouseLoop1
+	LDRB	R5,[R3],#1
+	STRB	R5,[R4],#1
 
-          TEQ       R5,#0
-          BNE       filter_mouse_loop1
+	TEQ	R5,#0
+	BNE	FilterMouseLoop1
 
-          SUB       R4,R4,#1
-          MOV       R5,#ASC(".")
-          STRB      R5,[R4],#1
+	SUB	R4,R4,#1
+	MOV	R5,#"."
+	STRB	R5,[R4],#1
 
-          ADR       R3,directory_name
+	ADR	R3,DirectoryName
 
-.filter_mouse_loop2
-          LDRB      R5,[R3],#1
-          STRB      R5,[R4],#1
+FilterMouseLoop2
+	LDRB	R5,[R3],#1
+	STRB	R5,[R4],#1
 
-          TEQ       R5,#0
-          BNE       filter_mouse_loop2
+	TEQ	R5,#0
+	BNE	FilterMouseLoop2
 
-          B         filter_exit
+	B	FilterExit
 
-.filter_menu_selection
-          TEQ       R0,#9
-          BNE       filter_exit
+FilterMenuSelection
+	TEQ	R0,#9
+	BNE	FilterExit
 
-          LDR       R2,[R1,#0]
-          TEQ       R2,#5
-          BNE       filter_exit
+	LDR	R2,[R1,#0]
+	TEQ	R2,#5
+	BNE	FilterExit
 
-          LDR       R2,[R1,#4]
-          MVN       R0,#NOT-1
-          TEQ       R2,R0
-          BNE       filter_exit
+	LDR	R2,[R1,#4]
+	MOV	R0,#-1
+	TEQ	R2,R0
+	BNE	FilterExit
 
-          MOV       R0,#8
-          ADRW      R1,block%
-          MOV       R2,#0
-          SWI       "XOS_File"
+	MOV	R0,#8
+	ADD	R1,R12,#WS_Block
+	MOV	R2,#0
+	SWI	"XOS_File"
 
-.filter_exit
-          LDMFD     R13!,{R0-R5,R14}
-          TEQ       PC,PC
-          MOVNES    PC,R14
-          MSR       CPSR_f,#0
-          MOV       PC,R14
+FilterExit
+	LDMFD	R13!,{R0-R5,R14}
+	TEQ	PC,PC
+	MOVNES	PC,R14
+	MSR	CPSR_f,#0
+	MOV	PC,R14
 
 ; ----------------------------------------------------------------------------------------------------------------------
 
-.directory_name
-          EQUZ      "Directory"
-          ALIGN
-
-; ======================================================================================================================
-]
-IF debug% THEN
-[OPT pass%
-          FNReportGen
-]
-ENDIF
-NEXT pass%
-
-SYS "OS_File",10,"<Basic$Dir>."+save_as$,&FFA,,code%,code%+P%
-
-END
-
-
-
-DEF FNworkspace(RETURN size%,dim%)
-LOCAL ptr%
-ptr%=size%
-size%+=dim%
-=ptr%
+DirectoryName
+	DCB	"Directory",0
+	ALIGN
+          
+	END
 
