@@ -126,7 +126,6 @@ OBJS := $(addprefix $(OBJDIR)/, $(OBJS))
 
 $(OUTDIR)/$(RUNIMAGE): $(OBJS) $(OBJDIR)
 	$(STRIP) $(STRIPFLAGS) -o $(OUTDIR)/$(RUNIMAGE) $(OBJS)
-	armalyser -d -o Compare/new.txt $(OUTDIR)/$(RUNIMAGE)
 
 # Create a folder to hold the object files.
 
