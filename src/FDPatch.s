@@ -29,6 +29,8 @@
 ;version$="1.10"
 ;save_as$="FDPatch"
 
+	GET	$Include/SWINames
+
 ; ---------------------------------------------------------------------------------------------------------------------
 ; Set up the Module Workspace
 
@@ -86,7 +88,7 @@ InitCode
 
 	MOV	R0,#6
 	MOV	R3,#WS_Size
-	SWI	"XOS_Module"
+	SWI	XOS_Module
 	BVS	InitExit
 	STR	R2,[R12]
 	MOV	R12,R2
@@ -102,7 +104,7 @@ InitCode
 InitFindLoop
 	ADD	R1,R12,#WS_Block
 	MOV	R2,#16
-	SWI	"XTaskManager_EnumerateTasks"
+	SWI	XTaskManager_EnumerateTasks
 
 	ADD	R3,R12,#WS_Block
 	TEQ	R1,R3
@@ -139,15 +141,15 @@ InitRegisterFilter
 	MOV	R2,R12
 	LDR	R4,FilterPollMask
 
-	SWI	"XFilter_RegisterPostFilter"
+	SWI	XFilter_RegisterPostFilter
 
 InitExit
 	LDMFD	R13!,{PC}
 
 ; ----------------------------------------------------------------------------------------------------------------------
 
-FilerPollMask
-	DCD	&FFFFFFFF :EOR: (1<<6)+(1<<9)
+FilterPollMask
+	DCD	&FFFFFFFF :EOR: ((1<<6)+(1<<9))
 
 FilterTaskName
 	DCB	"Filer",0
@@ -168,14 +170,14 @@ FinalDeregisterFilter
 	ADR	R1,FilterCode
 	MOV	R2,R12
 	LDR	R4,FilterPollMask
-	SWI	"XFilter_DeRegisterPostFilter"
+	SWI	XFilter_DeRegisterPostFilter
 
 FinalReleaseWorkspace
 	TEQ	R12,#0
 	BEQ	FinalExit
 	MOV	R0,#7
 	MOV	R2,R12
-	SWI	"XOS_Module"
+	SWI	XOS_Module
 FinalExit
 	LDMFD	R13!,{PC}
 
@@ -201,7 +203,7 @@ FilterMouseClick
 	STR	R3,[R2,#0]
 
 	ORR	R1,R2,#1
-	SWI	"XWimp_GetWindowInfo"
+	SWI	XWimp_GetWindowInfo
 
 	LDR	R3,[R2,#76]
 	MOV	R4,R2
@@ -244,7 +246,7 @@ FilterMenuSelection
 	MOV	R0,#8
 	ADD	R1,R12,#WS_Block
 	MOV	R2,#0
-	SWI	"XOS_File"
+	SWI	XOS_File
 
 FilterExit
 	LDMFD	R13!,{R0-R5,R14}
