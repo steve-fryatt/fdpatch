@@ -1,0 +1,111 @@
+<document title="Filer Dir Patch">
+<define name="version" value="1.10">
+<define name="date" value="6 December 2002" length=30 align="right">
+
+
+
+
+
+<literal mode="Text">
+=============================================================================
+FilerDirPatch - Patch Desktop Filer's directory menu             Version $$version$$
+
+(C) Stephen Fryatt, 2001                       $$date$$
+=============================================================================
+</literal>
+
+
+
+
+
+<chapter title="License" file="License">
+
+<cite>FilerDirPatch</cite> is <strong>Freeware</strong>.  Copyright is held by the author, Stephen Fryatt, 2001.
+
+<cite>FilerDirPatch</cite> may be copied freely, so long as it remains unaltered with all its files and documentation intact.
+
+If you wish to distribute <cite>FilerDirPatch</cite>, please contact me to get my permission. This is so that I can ensure that you have the latest version available. <cite>FilerDirPatch</cite> may not be sold, although Public Domain libraries may charge for the cost of discs.
+
+No guarantee is made as to the suitability or stability of <cite>FilerDirPatch</cite> for any particular purpose.  No liability can be accepted by the author for any problems or damage caused by the use of FilerDirPatch.
+
+</chapter>
+
+
+
+
+
+<chapter title="Introduction" file="Introduction">
+
+<cite>FilerDirPatch</cite> is a small patch to cause a new directory to be created if <menu>New directory</menu> is selected in a Filer window (instead of moving the pointer right to open the dialogue box).
+
+As a long-time user of <cite>MS Windows</cite>, this had always seemed an omission and with the arrival of RISC OS 4 and the <key>alt</key>-click renaming in the window, I often found myself wishing that the option worked as expected.
+
+Although the patch is trivial, having written it it seems daft to make others who would like the feature re-invent the wheel.
+
+</chapter>
+
+
+
+
+
+<chapter title="Installing and Using FilerDirPatch" file="Use">
+
+<cite>FilerDirPatch</cite> requires RISC OS 3.1 or later.  It is 26/32 bit netural and should work on RISC OS 5; it will not be needed on Select.
+
+To install <cite>FilerDirPatch</cite>, copy the <file>FDPatch</file> module to a suitable place and double-click on it to run.  If you want it to run on startup, the module should be placed in your boot sequence.  On a machine with the new boot structure installed, this can be done by copying it into the <file>Choices:Boot.Tasks</file> directory. On older machines, you will have to make your own arrangements (but you will probably have made your own boot system anyway).
+
+To use it, just click <mouse>select</mouse> on the <menu>New directory</menu> menu item and a new directory will be created in the current filer window (the one the menu was opened over) with the name <file>Directory</file>.  This can then be renamed as required.
+
+</chapter>
+
+
+
+
+
+<chapter title="Version History" file="History">
+
+The following is a list of all the versions of <cite>Filer Dir Patch</cite>.
+
+
+<subhead title="1.00 (4 August 2001)">
+
+<list>
+<li>Initial release version.
+</list>
+
+<subhead title="1.05 (19 January 2002)">
+
+<list>
+<li>Fixed bug causing a directory to be created when creating a named directory through the writable menu field on RISC OS 3.
+</list>
+
+
+<subhead title="1.10 (6 December 2002)">
+
+Public Beta release.
+
+<list>
+<li>Module converted to new format and checked for 32-bit compatibility.
+</list>
+
+</chapter>
+
+
+
+
+
+<literal mode="Text">
+
+
+Updates and Contacting Me
+-------------------------
+
+  If you have any comments about FilerDirPatch, or would like to report any
+  bugs that you find, you can email me at the address below.
+
+  Updates to FilerDirPatch and more programs for RISC OS computers can be
+  found on my website at http://www.stevefryatt.org.uk/software/
+
+  Stephen Fryatt
+  email: steve@stevefryatt.org.uk
+</literal>
