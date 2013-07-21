@@ -10,7 +10,7 @@
 =============================================================================
 FilerDirPatch - Patch Desktop Filer's directory menu             Version $$version$$
 
-(C) Stephen Fryatt, 2001                       $$date$$
+(C) Stephen Fryatt, 2001-2013                  $$date$$
 =============================================================================
 </literal>
 
@@ -18,15 +18,19 @@ FilerDirPatch - Patch Desktop Filer's directory menu             Version $$versi
 
 
 
-<chapter title="License" file="License">
+<chapter title="Licence" file="Licence">
 
-<cite>FilerDirPatch</cite> is <strong>Freeware</strong>.  Copyright is held by the author, Stephen Fryatt, 2001.
+<cite>FilerDirPatch</cite> is licensed under the EUPL, Version&nbsp;1.1 only (the "Licence"); you may not use this work except in compliance with the Licence.
 
-<cite>FilerDirPatch</cite> may be copied freely, so long as it remains unaltered with all its files and documentation intact.
+You may obtain a copy of the Licence at <link ref="#url http://joinup.ec.europa.eu/software/page/eupl">http://joinup.ec.europa.eu/software/page/eupl</link>
 
-If you wish to distribute <cite>FilerDirPatch</cite>, please contact me to get my permission. This is so that I can ensure that you have the latest version available. <cite>FilerDirPatch</cite> may not be sold, although Public Domain libraries may charge for the cost of discs.
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;<strong>as is</strong>&quot; basis, <strong>without warranties or conditions of any kind</strong>, either express or implied.
 
-No guarantee is made as to the suitability or stability of <cite>FilerDirPatch</cite> for any particular purpose.  No liability can be accepted by the author for any problems or damage caused by the use of FilerDirPatch.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+
+The source for <cite>FilerDirPatch</cite> can be found alongside this binary download, at <link ref="#url http://www.stevefryatt.org.uk/software">http://www.stevefryatt.org.uk/software</link>
+
+The necessary libraries and build tools can be found at <link ref="#url http://www.stevefryatt.org.uk/software/build">http://www.stevefryatt.org.uk/software/build</link>
 
 </chapter>
 
@@ -86,6 +90,13 @@ Public Beta release.
 
 <list>
 <li>Module converted to new format and checked for 32-bit compatibility.
+</list>
+
+
+<subhead title="Test Build">
+
+<list>
+<li>Converted source to ObjAsm format and checked for ARMv7 compatibility.
 </list>
 
 </chapter>
