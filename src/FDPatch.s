@@ -247,6 +247,7 @@ FilterMenuSelection
 
 FilterExit
 	LDMFD	R13!,{R0-R5,R14}
+	TEQ	R0,R0
 	TEQ	PC,PC
 	MOVNES	PC,R14
 	MSR	CPSR_f,#0
