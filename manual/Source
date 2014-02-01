@@ -10,8 +10,9 @@
 =============================================================================
 FilerDirPatch - Patch Desktop Filer's directory menu             Version $$version$$
 
-(C) Stephen Fryatt, 2001-2013                  $$date$$
+(C) Stephen Fryatt, 2001-2014                  $$date$$
 =============================================================================
+
 </literal>
 
 
@@ -93,7 +94,7 @@ Public Beta release.
 </list>
 
 
-<subhead title="Test Build">
+<subhead title="1.11 (1 February 2014)">
 
 <list>
 <li>Converted source to ObjAsm format and checked for ARMv7 compatibility.
@@ -106,7 +107,6 @@ Public Beta release.
 
 
 <literal mode="Text">
-
 
 Updates and Contacting Me
 -------------------------
