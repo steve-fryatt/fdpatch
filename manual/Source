@@ -43,7 +43,7 @@ The necessary libraries and build tools can be found at <link ref="#url http://w
 
 <cite>FilerDirPatch</cite> is a small patch to cause a new directory to be created if <menu>New directory</menu> is selected in a Filer window (instead of moving the pointer right to open the dialogue box).
 
-As a long-time user of <cite>MS Windows</cite>, this had always seemed an omission and with the arrival of RISC OS 4 and the <key>alt</key>-click renaming in the window, I often found myself wishing that the option worked as expected.
+As a long-time user of <cite>MS&nbsp;Windows</cite>, this had always seemed an omission and with the arrival of RISC&nbsp;OS&nbsp;4 and the <key>alt</key>-click renaming in the window, I often found myself wishing that the option worked as expected.
 
 Although the patch is trivial, having written it it seems daft to make others who would like the feature re-invent the wheel.
 
@@ -55,7 +55,7 @@ Although the patch is trivial, having written it it seems daft to make others wh
 
 <chapter title="Installing and Using FilerDirPatch" file="Use">
 
-<cite>FilerDirPatch</cite> requires RISC OS 3.1 or later.  It is 26/32 bit netural and should work on RISC OS 5; it will not be needed on Select.
+<cite>FilerDirPatch</cite> requires RISC&nbsp;OS&nbsp;3.1 or later.  It is 26/32 bit netural and should work on RISC&nbsp;OS&nbsp;5; it will not be needed on Select.
 
 To install <cite>FilerDirPatch</cite>, copy the <file>FDPatch</file> module to a suitable place and double-click on it to run.  If you want it to run on startup, the module should be placed in your boot sequence.  On a machine with the new boot structure installed, this can be done by copying it into the <file>Choices:Boot.Tasks</file> directory. On older machines, you will have to make your own arrangements (but you will probably have made your own boot system anyway).
 
@@ -81,7 +81,7 @@ The following is a list of all the versions of <cite>Filer Dir Patch</cite>.
 <subhead title="1.05 (19 January 2002)">
 
 <list>
-<li>Fixed bug causing a directory to be created when creating a named directory through the writable menu field on RISC OS 3.
+<li>Fixed bug causing a directory to be created when creating a named directory through the writable menu field on RISC&nbsp;OS&nbsp;3.
 </list>
 
 
@@ -94,7 +94,7 @@ Public Beta release.
 </list>
 
 
-<subhead title="1.11 (1 February 2014)">
+<subhead title="1.11 (2 February 2014)">
 
 <list>
 <li>Converted source to ObjAsm format and checked for ARMv7 compatibility.
