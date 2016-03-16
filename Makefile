@@ -28,7 +28,7 @@ ARCHIVE := fdpatch
 
 MODULE := FDPatch,ffa
 
-OBJS ?= FDPatch.o
+OBJS := FDPatch.o
 
 include $(SFTOOLS_MAKE)/Module
 
