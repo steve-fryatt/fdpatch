@@ -92,11 +92,10 @@ InitCode
 
 ; Initialise the workspace that was just claimed.
 
-
-; Enumerate the tasks and apply a filter to the filer.
-
 	MOV	R0,#0
 	STR	R0,[R12,#WS_TaskHandle]
+
+; Enumerate the tasks and apply a filter to the filer.
 
 InitFindLoop
 	ADD	R1,R12,#WS_Block
